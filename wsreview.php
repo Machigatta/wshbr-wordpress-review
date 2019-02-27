@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-review
 Description: Make your post to a simple review
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 1.1
-Stable Tag: 1.1
+Version: 1.2
+Stable Tag: 1.2
  */
 class wsreview
 {
@@ -17,14 +17,9 @@ class wsreview
         add_action('the_excerpt', array($this,'disablePlugin'));
         //Add Something to the scripts-loader
         add_action('wp_enqueue_scripts', array($this, 'addStylesAndScripts'));
-        add_action( 'save_post', 'wsreview_field_save');
-        add_action('plugins_loaded', 'wsreview_init');
+        add_action( 'admin_enqueue_scripts', array($this, 'addStylesAndScripts') );
+        
     }
-
-    function wsreview_init() {
-        load_plugin_textdomain( 'wsreview', false, dirname(plugin_basename(__FILE__)).'/lang/' );
-    }
-    
 
     //Add Content to page
     function addContent($content) {
@@ -47,29 +42,7 @@ class wsreview
         $options = get_option('wsreview_settings');
         wp_enqueue_style('wsreview-font', 'https://fonts.googleapis.com/css?family=Open+Sans');
         wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.1.9");
-        wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array(), "0.1.1");
-    }
-    //On Save, save data
-    function wsreview_field_save($post_id) {
-	    // check if this isn't an auto save
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
-            return;
-        // security check
-        if ( !wp_verify_nonce( $_POST['wsreview_nonce'], plugin_basename( __FILE__ ) ) )
-            return;
-
-        if ( isset( $_POST['isReview'] ) ) :
-            if($_POST['isReview'] == "true"){
-                update_post_meta( $post_id, 'isReview', "1");
-                update_post_meta( $post_id, 'reviewShort', $_POST['reviewShort']);
-                update_post_meta( $post_id, 'reviewValue', $_POST['reviewValue']);
-            }else{
-                update_post_meta( $post_id, 'isReview', "0");	
-                update_post_meta( $post_id, 'reviewShort', $_POST['reviewShort']);
-                update_post_meta( $post_id, 'reviewValue', $_POST['reviewValue']);
-            }
-        endif;
-            
+        wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array('jquery'), "0.1.4");
     }
     //Draw the plugin
     public function renderPlugin($options, $post_object)
@@ -158,11 +131,35 @@ function wsreview_meta_box($post) {
     <h4>".__("Rating","wsreview")."</h4>
     <div class='wsreview-slider-container'>
         <output id='wsreview-number' for='wsreview-slider'>0</output>
-        <input id='wsreview-slider' name='reviewValue' type='range' min='0' max='10' value='".get_post_meta($post->ID,"reviewValue")[0] ."' step='1' style='width:100%'>
+        <input id='wsreview-slider' name='reviewValue' type='range' min='0' max='10' value='".get_post_meta($post->ID,"reviewValue")[0] ."' step='0.5' style='width:100%'>
 	</div>
     <h4>".__("Short-Review","wsreview")."</h4>
     <textarea rows=\"10\" cols=\"30\" name=\"reviewShort\" style='width:100%'>".get_post_meta($post->ID,"reviewShort",true)."</textarea></div>
     </div>";
 }
 add_action ('add_meta_boxes','addMetaBox');
+
+//On Save, save data
+function wsreview_field_save($post_id) {
+    // check if this isn't an auto save
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+        return;
+    // security check
+    if ( !wp_verify_nonce( $_POST['wsreview_nonce'], plugin_basename( __FILE__ ) ) )
+        return;
+
+    if ( isset( $_POST['isReview'] ) ) :
+        if($_POST['isReview'] == "true"){
+            update_post_meta( $post_id, 'isReview', "1");
+            update_post_meta( $post_id, 'reviewShort', $_POST['reviewShort']);
+            update_post_meta( $post_id, 'reviewValue', $_POST['reviewValue']);
+        }else{
+            update_post_meta( $post_id, 'isReview', "0");	
+            update_post_meta( $post_id, 'reviewShort', $_POST['reviewShort']);
+            update_post_meta( $post_id, 'reviewValue', $_POST['reviewValue']);
+        }
+    endif;
+        
+}
+add_action( 'save_post', 'wsreview_field_save');
 ?>
