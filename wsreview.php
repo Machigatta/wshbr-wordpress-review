@@ -42,7 +42,7 @@ class wsreview
         $options = get_option('wsreview_settings');
         wp_enqueue_style('wsreview-font', 'https://fonts.googleapis.com/css?family=Open+Sans');
         wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.1.9");
-        wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array('jquery'), "0.1.4");
+        wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array('jquery'), "0.1.5");
     }
     //Draw the plugin
     public function renderPlugin($options, $post_object)
