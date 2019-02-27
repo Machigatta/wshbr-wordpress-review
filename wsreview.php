@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-review
 Description: Make your post to a simple review
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 1.0
-Stable Tag: 1.0
+Version: 1.1
+Stable Tag: 1.1
  */
 class wsreview
 {
@@ -17,8 +17,14 @@ class wsreview
         add_action('the_excerpt', array($this,'disablePlugin'));
         //Add Something to the scripts-loader
         add_action('wp_enqueue_scripts', array($this, 'addStylesAndScripts'));
-        add_action( 'save_post', 'wsreview_field_save' );
+        add_action( 'save_post', 'wsreview_field_save');
+        add_action('plugins_loaded', 'wsreview_init');
     }
+
+    function wsreview_init() {
+        load_plugin_textdomain( 'wsreview', false, dirname(plugin_basename(__FILE__)).'/lang/' );
+    }
+    
 
     //Add Content to page
     function addContent($content) {
@@ -40,10 +46,11 @@ class wsreview
     {
         $options = get_option('wsreview_settings');
         wp_enqueue_style('wsreview-font', 'https://fonts.googleapis.com/css?family=Open+Sans');
-        wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.1.3");
+        wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.1.9");
+        wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array(), "0.1.1");
     }
     //On Save, save data
-    function hotStuff_field_data($post_id) {
+    function wsreview_field_save($post_id) {
 	    // check if this isn't an auto save
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
             return;
@@ -70,15 +77,19 @@ class wsreview
         $ret = "";
         if(get_post_meta($post_object["id"],'isReview')){
             
-            $ret .= '<div class="review-container">
-                        <img src="'.  get_avatar_url( $post_object["author_id"], 32 ).'" class="img-responsive img-thumbnail pull-left">
-                        <div class="rating pull-right">
-                            '. get_post_meta($post_object["id"],'reviewValue')[0] .' <br><small>von 10</small>
+            $ret .= '<div class="review-container row">
+                        <div class="col-md-2">
+                            <div class="rating">
+                                <small>'. get_post_meta($post_object["id"],'reviewValue')[0] .' / 10</small>
+                            </div>
+                            <img src="'.  get_avatar_url( $post_object["author_id"], 32 ).'" class="img-responsive">
+                            <p class="review-author">'.$post_object["author"].'</p>
                         </div>
-                        <p class="review-author">'.$post_object["author"].'</p>
-                        <p class="align-justify review-short">
-                            '. get_post_meta($post_object["id"],'reviewShort')[0] .'
-                        </p>
+                        <div class="col-md-10">
+                            <p class="align-justify review-short">
+                                '. get_post_meta($post_object["id"],'reviewShort')[0] .'
+                            </p>
+                        </div>
                     </div>';
             
         }
@@ -144,9 +155,12 @@ function wsreview_meta_box($post) {
     echo ">markiert als Review
     <div id='reviewOptions'>
     <hr>
-    <h4>Wertung (bis 10, bsp. 5,6,7,5.5,8.5)</h4>
-    <input type='text' name='reviewValue' value='".get_post_meta($post->ID,"reviewValue")[0] ."' style='width:100%'>
-    <h4>Kurzbeschreibung</h4>
+    <h4>".__("Rating","wsreview")."</h4>
+    <div class='wsreview-slider-container'>
+        <output id='wsreview-number' for='wsreview-slider'>0</output>
+        <input id='wsreview-slider' name='reviewValue' type='range' min='0' max='10' value='".get_post_meta($post->ID,"reviewValue")[0] ."' step='1' style='width:100%'>
+	</div>
+    <h4>".__("Short-Review","wsreview")."</h4>
     <textarea rows=\"10\" cols=\"30\" name=\"reviewShort\" style='width:100%'>".get_post_meta($post->ID,"reviewShort",true)."</textarea></div>
     </div>";
 }
