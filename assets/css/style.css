@@ -1,3 +1,5 @@
+/* POST */
+
 div.review-container {
     border-top: 2px solid gray;
     position:relative;
@@ -48,4 +50,32 @@ div.review-container > .review-short {
     padding-top: 6px;
     box-sizing: border-box;
     color: white;
+}
+
+/* WIDGET */
+
+
+.reviewBlock {
+    padding: 10px;
+    border: 1px solid #d6d6d6;
+    background: rgba(236, 236, 236, 0.56);
+}
+
+.reviewPragraph {
+      text-align: justify;
+    font-size: 80%;
+    margin: 0px;
+    margin-top: 5px;
+}
+
+.review-border {
+    width:100%;height:2px;background:#06b48f;   
+}
+
+.sidebar-picture{
+    filter: brightness(120%);
+    position:relative;
+}
+.sidebar-picture > img {
+    opacity: 0.8;
 }

@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-review
 Description: Make your post to a simple review
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 1.2
-Stable Tag: 1.2
+Version: 2.0
+Stable Tag: 2.0
  */
 class wsreview
 {
@@ -41,7 +41,7 @@ class wsreview
     {
         $options = get_option('wsreview_settings');
         wp_enqueue_style('wsreview-font', 'https://fonts.googleapis.com/css?family=Open+Sans');
-        wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.1.9");
+        wp_enqueue_style('wsreview-style', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css', array(), "0.2.0");
         wp_enqueue_script('wsreview-script', trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/wsreview.js', array('jquery'), "0.1.5");
     }
     //Draw the plugin
@@ -108,6 +108,50 @@ class wsreview
             'img' => get_the_post_thumbnail_url($post_id),
         );
         return $post_object;
+    }
+    public function renderPluginAsWidget($postCount){
+        ?>
+    <div>
+        <span class="sidebar-head">» Reviews</span>
+            <div class="sidebar-block review-block">
+                <center>
+                <?php
+                        $the_query = new WP_Query( array(
+                            'post_type' => 'post',
+                            'post_status' => 'publish',
+                            'posts_per_page' => $postCount,
+                            'category_name' => "review",
+                            'orderby' => 'id')
+                        );
+
+                        if ( $the_query->have_posts() ) {
+                            echo '<div class="review-border"></div>';
+                            while ( $the_query->have_posts() ) {
+                                
+                                echo '<div class="reviewBlock">';
+                                $the_query->the_post();
+                                //  if($sliderCaption == ""){
+                                //      echo $sliderCaption = get_the_title();
+                                //  }
+                                echo '<a href="'. esc_url( get_permalink()).'" target="_blank">';
+                                echo '<div class="sidebar-picture" data-content="'.get_the_title().'">';
+                                if(has_post_thumbnail()){
+                                    the_post_thumbnail("",array( 'class' => 'img-responsive' ));
+                                    }
+                                echo '</div></a><p class="reviewPragraph">'.get_the_excerpt().'</p></div>';
+                            }
+                            /* Restore original Post Data */
+                            wp_reset_postdata();
+                            echo '<div class="review-border"></div>';
+                        } else {
+                            // no posts found
+                        }
+                        ?>      
+                </center>
+            </div>
+        </div>
+
+    <?php
     }
 }
 //base init
