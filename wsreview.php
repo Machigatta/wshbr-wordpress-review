@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-review
 Description: Make your post to a simple review
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 2.0
-Stable Tag: 2.0
+Version: 2.1
+Stable Tag: 2.1
  */
 class wsreview
 {
@@ -136,7 +136,7 @@ class wsreview
                                 echo '<a href="'. esc_url( get_permalink()).'" target="_blank">';
                                 echo '<div class="sidebar-picture" data-content="'.get_the_title().'">';
                                 if(has_post_thumbnail()){
-                                    the_post_thumbnail("",array( 'class' => 'img-responsive' ));
+                                    the_post_thumbnail("",array( 'class' => 'img-responsive no-spoiler-image' ));
                                     }
                                 echo '</div></a><p class="reviewPragraph">'.get_the_excerpt().'</p></div>';
                             }
